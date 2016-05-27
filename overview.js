@@ -1,6 +1,6 @@
 (function( overview, $, undefined ) {
 
-  overview.clearQuestionModal = function() {
+  overview.clearModal = function() {
     $('input[name=questionId]').removeAttr('value');
     $('#question-content').val('');
 
@@ -19,19 +19,6 @@
     $('#print-button').addClass('hidden');
   };
 
-  overview.clearParticleModal = function() {
-    $('input[name=particleSystemId]').removeAttr('value');
-
-    $('#particle-qr-preview').addClass('hidden');
-    $('#particle-delete-button').addClass('hidden');
-    $('#particle-print-button').addClass('hidden');
-
-    $('#start-color-picker').colorpicker('setValue', '#000000');
-    $('#end-color-picker').colorpicker('setValue', '#000000');
-
-    $('#particle-delete-button').addClass('hidden');
-  };
-
   overview.print = function() {
     var prtContent = document.getElementById("print-page");
     var WinPrint = window.open('', '', 'left=0,top=0,toolbar=0,scrollbars=0,status=0');
@@ -42,17 +29,7 @@
     WinPrint.close();
   };
 
-  overview.printParticle = function() {
-    var prtContent = document.getElementById("print-page-particle");
-    var WinPrint = window.open('', '', 'left=0,top=0,toolbar=0,scrollbars=0,status=0');
-    WinPrint.document.write(prtContent.innerHTML);
-    WinPrint.document.close();
-    WinPrint.focus();
-    WinPrint.print();
-    WinPrint.close();
-  };
-
-  overview.sendDeleteQuestionRequest = function() {
+  overview.sendDeleteRequest = function() {
     var id = $('input[name=questionId]').val();
 
     $.ajax({
@@ -65,73 +42,13 @@
     });
   };
 
-  overview.sendDeleteParticleRequest = function() {
-    var id = $('input[name=particleSystemId]').val();
-    console.log('api.php/particlesystems/' + id);
-
-    $.ajax({
-      url: 'api.php/particlesystems/' + id,
-      type: 'DELETE',
-      success: function(result) {
-          console.log(result);
-          location.reload(true);
-      }
-    });
-  };
-
-  overview.updateParticleTable = function(jsonString) {
-    var tableData = JSON.parse(jsonString);
-
-    $('#particle-table').bootstrapTable({
-      data: tableData.particleSystems
-    }).on('click-row.bs.table', function (e, row, $element) {
-      overview.clearParticleModal();
-
-      $('#particle-qr-preview').removeClass('hidden');
-      $('input[name=particleSystemId]').attr('value', row.id);
-
-      $('#start-color-picker').colorpicker('setValue', row.startColor);
-      $('#end-color-picker').colorpicker('setValue', row.endColor);
-
-      $.get(
-          "api.php/particleqrcode/" + row.id,
-          {},
-          function(data) {
-              var json = JSON.parse(data);
-              $('#particle-qr').attr('src', json.url);
-          }
-      );
-
-      $.get(
-          "api.php/particleqrcodeprint/" + row.id,
-          {},
-          function(data) {
-              var qrCode = JSON.parse(data);
-              console.log(data);
-              $('#print-particle-qr').attr('src', qrCode.url);
-          }
-      );
-
-      $('#print-title-particle').html("Partikelsystem: " + row.startColor + " - " + row.endColor);
-
-      $('#particle-delete-button').removeClass('hidden');
-      $('#particle-print-button').removeClass('hidden');
-    });
-
-    // TODO: only do this if there is a matching row in the json (table is filled.)
-    $('#particle-table > tbody > tr').attr('data-toggle', 'modal');
-    $('#particle-table > tbody > tr').attr('href', '#particle-modal');
-    $('#particle-table > tbody > tr').attr('style', 'cursor: pointer');
-    // data-toggle="modal" href="#question-modal"
-  };
-
-  overview.updateQuestionTable = function(jsonString) {
+  overview.updateTable = function(jsonString) {
     var tableData = JSON.parse(jsonString);
 
     $('#question-table').bootstrapTable({
       data: tableData.questions
     }).on('click-row.bs.table', function (e, row, $element) {
-      overview.clearQuestionModal();
+      overview.clearModal();
 
       $('#qr-preview').removeClass('hidden');
 
@@ -177,7 +94,6 @@
 
     });
 
-    // TODO: only do this if there is a matching row in the json (table is filled.)
     $('#question-table > tbody > tr').attr('data-toggle', 'modal');
     $('#question-table > tbody > tr').attr('href', '#question-modal');
     $('#question-table > tbody > tr').attr('style', 'cursor: pointer');
