@@ -483,11 +483,11 @@
    * @return string - The JSON answer.
    */
   function get_particlesystems() {
-    if (!file_exists("particle/")) {
-      return '{"particleSystems": []}';
+    if (!file_exists("particles/")) {
+      return '{"particles": []}';
     }
     $particleSystems = array();
-    $iterator = new FilesystemIterator("particle/", FilesystemIterator::SKIP_DOTS);
+    $iterator = new FilesystemIterator("particles/", FilesystemIterator::SKIP_DOTS);
     while($iterator->valid()) {
       $file = fopen($iterator->getPathname(), "r");
       $content = fread($file, filesize($iterator->getPathname()));
@@ -495,10 +495,12 @@
       array_push($particleSystems, $content);
       $iterator->next();
     }
-    return '{"particleSystems":' . "[" . implode(",", $particleSystems) . "]" . "}";
+    return '{"particles":' . "[" . implode(",", $particleSystems) . "]" . "}";
   }
+  
+  
   /**
-   * Function to handle the "/particlesystems/<id>" REST-GET call.
+   * Function to handle the "/particles/<id>" REST-GET call.
    * It returns the particle system json, if a system with the given id exists.
    * Otherwise it returns an empty 404 HttpMessage.
    *
@@ -507,7 +509,7 @@
    * @return string - The JSON-string for the particle system.
    */
   function get_particlesystem_by_id($id) {
-    $filePath = "particle/".$id.".json";
+    $filePath = "particles/".$id.".json";
     if (file_exists($filePath)) {
       $file = fopen($filePath, "r");
       $content = fread($file, filesize($filePath));
@@ -517,8 +519,9 @@
     http_response_code(404);
     return "";
   }
+  
   /**
-   * Function to handle the "/particlesystems/<id>" REST-DELETE call.
+   * Function to handle the "/particles/<id>" REST-DELETE call.
    * It deletes the particle system with the given id, if existing.
    * Otherwise nothing happens.
    *
@@ -527,7 +530,7 @@
    * @return string - an empty string.
    */
   function delete_particlesystem($id) {
-    $particleFilename = "particle/".$id.".json";
+    $particleFilename = "particles/".$id.".json";
     if (file_exists($particleFilename)) {
       unlink($particleFilename);
     }
@@ -544,8 +547,8 @@
    *
    * @return string - The answer JSON-string.
    */
-  function get_particlesystem_qrcode_by_id($id, $dimension) {
-    $filename = "particle/".$id.".json";
+  function get_particle_qrcode_by_id($id, $dimension) {
+    $filename = "particles/".$id.".json";
     if (!file_exists($filename)) {
       http_response_code(404);
       return "";
@@ -557,23 +560,6 @@
           ."&chs=".$dimension."x".$dimension
           ."&chl=".urlencode($particleContent);
     return '{"url":"'.$Url.'"}';
-  }
-  /**
-   * Function to handle the "/particlesystems" REST-POST call.
-   *
-   * It stores the transmitted particle system on the file system
-   * and redirects to the previous page.
-   */
-  function save_particle_system() {
-    // create particle system from POST data
-    $submittedParticleSystem = new ParticleSystem(
-                              $_POST["particleSystemId"],
-                              $_POST["startColor"],
-                              $_POST["endColor"]
-                            );
-    $submittedParticleSystem->saveToFile();
-    // redirect back to previous page
-    header('Location: ' . $_SERVER['HTTP_REFERER']);
   }
 
   /**
@@ -677,7 +663,26 @@
             }
           }
 
-          handle_error();  
+          handle_error();
+
+		case 'particles':
+		  if ($requestSize == 1) {
+			exit(get_particlesystems());
+		  }			
+		  if ($requestSize == 2) {
+			if ($request[1] == "") {
+-           	exit(get_particlesystems());
+			}
+			exit(get_particlesystem_by_id($request[1]));
+		  }
+			
+			if ($requestSize == 3) {
+				if ($request[2] == "") {
+					exit(get_particlesystem_by_id($request[1]));
+				}
+			}
+			handle_error();
+  
         case 'qrcodes':
           exit(get_qrcodes_by_id($request[1], 200));
         case 'qrcodesprint':
@@ -688,8 +693,13 @@
           exit(get_position_qrcode_by_id($request[1], 200));
         case 'qrcodesprint2':
           exit(get_position_qrcode_by_id($request[1], 400));
+		case 'qrcodes5':
+          exit(get_particle_qrcode_by_id($request[1], 200));
+        case 'qrcodesprint5':
+          exit(get_particle_qrcode_by_id($request[1], 400));
 		case 'locationcount':
           exit(get_location_count());	
+		
         default:
           handle_error();
       }
@@ -704,10 +714,13 @@
 		  exit(delete_thing($request[1]));  
 		case 'locations':
 		  exit(delete_location($request[1]));
+		case 'particles':
+		  exit(delete_particlesystem($request[1]));
         default:
           handle_error();
       }
-      break;
+      break; 
+	  
     default:
       handle_error();
       break;

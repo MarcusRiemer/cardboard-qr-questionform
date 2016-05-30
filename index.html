@@ -16,6 +16,10 @@
 
     <!-- theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/lumen/bootstrap.min.css">
+	
+		<!-- bootstrap colorpicker -->
+    <link rel="stylesheet" href="css/bootstrap-colorpicker.min.css">
+
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -32,13 +36,13 @@
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.0/bootstrap-table.min.js"></script>
-
     <script src="holder.js"></script>
+	<script src="js/bootstrap-colorpicker.min.js"></script>
 	
 	 <!-- header Ort  -->
     <div class="container">
       <div class="page-header text-center">
-        <h1> Ortübersicht </h1>
+        <h1> Ortsübersicht </h1>
       </div>
     </div>
 
@@ -500,9 +504,6 @@
         </div>
       </div>
     </div>
-	
-	<div>
-	</div>
 
     <script src="overview3.js"></script>
 
@@ -515,5 +516,103 @@
           }
       );
     </script>
+	
+ <!-- header Ort  -->
+    <div class="container">
+      <div class="page-header text-center">
+        <h1>Partikelsystem</h1>
+      </div>
+    </div>
+
+    <!-- content  -->
+    <div class="container">
+      <table id="particle-table" data-sort-name="id" data-sort-order="asc">
+        <thead>
+          <tr>
+            <th data-field="id">ID</th>
+			<th data-field="startColor">Startfarbe</th>
+			<th data-field="endColor">Zielfarbe</th>
+          </tr>
+        </thead>
+      </table>
+
+      <hr>
+
+      <button onclick="overview5.clearModal()" class="btn btn-info" data-toggle="modal" href="#particle-modal">Neues Partikelsystem</button>
+    </div>
+	
+    <!-- modal definition -->
+    <div class="modal fade" id="particle-modal" tabindex="-1">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Particle</h4>
+          </div>
+          <div class="modal-body">
+            <form role="form" action="process5.php" method="post">
+              <div class="form-group hidden">
+                <div class="input-group">
+                  <span class="input-group-addon" id="particle-id">ID</span>
+                  <input type="text" class="form-control" aria-describedby="ID" name="particleId" value="-1">
+                </div>
+              </div>
+			  
+			  <div class="form-group">
+                <div class="page-header text-center">
+                  <h4>Startfarbe</h4>
+                </div>
+                <div class="input-group colorpicker-component" id="start-color-picker">
+					<span class="input-group-addon" style="min-width:3cm;" id="startColor">Startfarbe</span>
+                    <input type="text" class="form-control" value="#000000" aria-describedby="Startfarbe" name="startColor">
+                    <span class="input-group-addon"><i></i></span>
+                </div>
+			  </div>
+				
+			  <div class="form-group">
+				<div class="page-header text-center">
+                  <h4>Zielfarbe</h4>
+                </div>
+				<div class="input-group colorpicker-component" id="end-color-picker">
+                    <span class="input-group-addon" id="endColor" style="min-width:3cm;">Zielfarbe</span>
+                    <input type="text" class="form-control" value="#000000" aria-describedby="Zielfarbe" name="endColor">
+                    <span class="input-group-addon"><i></i></span>
+                </div>
+			  </div>
+			  
+			   <hr>
+			   
+              <button type="submit" class="btn btn-info">Save Changes</button>
+              <button type="button" id="delete5-button" onclick="overview5.sendDeleteRequest()" class="btn btn-danger">Delete</button>
+			  <button type="button" id="print5-button" onclick="overview5.print()" class="btn btn-default">Print</button>
+            </form>
+          </div>
+        </div>
+      </div>
+	 </div> 
+	
+	    <div class="hidden" id="print-page5">
+      <div class="dont-break">
+        <h3 id="print-title5"></h3>
+        <img id="print-particle-qr" style="outline-color:black; outline-style: solid;">
+      </div>
+    </div>
+
+    <script src="overview5.js"></script>
+
+    <script>
+      $.get(
+          "api.php/particles",
+          {},
+          function(data) {
+              overview5.updateTable(data);
+			  console.log(data);
+          }
+      );
+    </script>
+	
+	
+	
+	
   </body>
 </html>

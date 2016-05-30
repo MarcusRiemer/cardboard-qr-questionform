@@ -9,6 +9,7 @@
 	  const POSITION = 2;
 	  const THING = 3;
 	  const LOCATION = 4;
+	  const PARTICLESYSTEM = 5;
   }
 
   /**
@@ -52,6 +53,14 @@
 
 		$files = array();
 		$iterator = new FilesystemIterator("locations/", FilesystemIterator::SKIP_DOTS);
+	}
+	if	($type == DataType::PARTICLESYSTEM) {
+		if (!file_exists("particles/")) {
+		return 0;
+		}
+
+		$files = array();
+		$iterator = new FilesystemIterator("particles/", FilesystemIterator::SKIP_DOTS);
 	}
 
     while($iterator->valid()) {
@@ -130,6 +139,7 @@
 
       // close file
       fclose($dataFile);
+	  chown($path, "inf9903");
     }
   }
  /**
@@ -316,6 +326,33 @@
 
     protected function getPath() {
       return "coins/";
+    }
+  }
+  
+  /**
+   * Concrete particlesystem-data class.
+   */
+  class ParticleSystem extends Data {
+	private $startColor;
+    private $endColor;
+	
+    public function __construct($id, $startColor, $endColor) {
+      $this->id = $id;
+      $this->startColor = $startColor;
+      $this->endColor = $endColor;
+      $this->type = DataType::PARTICLESYSTEM;
+    }
+
+    public function jsonSerialize() {
+      return get_object_vars($this);
+    }
+
+    public function toJson() {
+      return json_encode($this);
+    }
+
+    protected function getPath() {
+      return "particles/";
     }
   }
 ?>
