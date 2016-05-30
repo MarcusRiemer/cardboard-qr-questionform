@@ -137,18 +137,27 @@
    */
    class Location extends Data {
     private $location;
+	private $describtion;
+	private $bssids;
+	private $navigate;
 	
 	    /**
      * Constructor for the location class.
      *
      * @param int       	$id            	The location id.
 	 * @param string    	$location      	name of the location
+	 * @param string		$describtion	describtion of the location
+	 * @param string	    $bssids			bssids conected with the location
+	 * @param int			$navigate		is the location nabigatable?
      *
      * @return Location
      */
-		public function __construct($id, $location) {
+		public function __construct($id, $location, $describtion, $bssids, $navigate) {
 		$this->id = $id;
 		$this->location = $location;
+		$this->describtion = $describtion;
+		$this->bssids = $bssids;
+		$this->navigate = $navigate;
 		$this->type = DataType::LOCATION;
 		}
 

@@ -468,6 +468,113 @@
     http_response_code(404);
     return "";
   }
+  
+  /***************************************************************************/
+  /* PARTICLE SYSTEMS */
+  /**
+   * Function to handle the "/particlesystems/" REST-GET call to get all
+   * particle systems.
+   *
+   * It looks for all existing particle systems on the file-system and
+   * returns them all in JSON-format.
+   * The JSON will be an JSON-object, containing an JSON-object "particleSystems",
+   * which contains an array of all particle systems in JSON.
+   *
+   * @return string - The JSON answer.
+   */
+  function get_particlesystems() {
+    if (!file_exists("particle/")) {
+      return '{"particleSystems": []}';
+    }
+    $particleSystems = array();
+    $iterator = new FilesystemIterator("particle/", FilesystemIterator::SKIP_DOTS);
+    while($iterator->valid()) {
+      $file = fopen($iterator->getPathname(), "r");
+      $content = fread($file, filesize($iterator->getPathname()));
+      fclose($file);
+      array_push($particleSystems, $content);
+      $iterator->next();
+    }
+    return '{"particleSystems":' . "[" . implode(",", $particleSystems) . "]" . "}";
+  }
+  /**
+   * Function to handle the "/particlesystems/<id>" REST-GET call.
+   * It returns the particle system json, if a system with the given id exists.
+   * Otherwise it returns an empty 404 HttpMessage.
+   *
+   * @param int         $id             The particle system id.
+   *
+   * @return string - The JSON-string for the particle system.
+   */
+  function get_particlesystem_by_id($id) {
+    $filePath = "particle/".$id.".json";
+    if (file_exists($filePath)) {
+      $file = fopen($filePath, "r");
+      $content = fread($file, filesize($filePath));
+      fclose($file);
+      return $content;
+    }
+    http_response_code(404);
+    return "";
+  }
+  /**
+   * Function to handle the "/particlesystems/<id>" REST-DELETE call.
+   * It deletes the particle system with the given id, if existing.
+   * Otherwise nothing happens.
+   *
+   * @param int         $id             The particle system id.
+   *
+   * @return string - an empty string.
+   */
+  function delete_particlesystem($id) {
+    $particleFilename = "particle/".$id.".json";
+    if (file_exists($particleFilename)) {
+      unlink($particleFilename);
+    }
+    return "";
+  }
+  /**
+   * Function to handle the "/particleqrcode/<id>" and "/particleqrcodeprint/<id>" REST-GET calls.
+   *
+   * It returns a JSON-string in which the google-api qr-code urls for the system.
+   * are contained in fields with respective names.
+   *
+   * @param int         $id             The particle system id.
+   * @param int         $dimension      The wanted qr-code dimension.
+   *
+   * @return string - The answer JSON-string.
+   */
+  function get_particlesystem_qrcode_by_id($id, $dimension) {
+    $filename = "particle/".$id.".json";
+    if (!file_exists($filename)) {
+      http_response_code(404);
+      return "";
+    }
+    $file = fopen($filename, "r");
+    $particleContent = fread($file, filesize($filename));
+    fclose($file);
+    $Url = "https://chart.googleapis.com/chart?cht=qr&choe=UTF-8"
+          ."&chs=".$dimension."x".$dimension
+          ."&chl=".urlencode($particleContent);
+    return '{"url":"'.$Url.'"}';
+  }
+  /**
+   * Function to handle the "/particlesystems" REST-POST call.
+   *
+   * It stores the transmitted particle system on the file system
+   * and redirects to the previous page.
+   */
+  function save_particle_system() {
+    // create particle system from POST data
+    $submittedParticleSystem = new ParticleSystem(
+                              $_POST["particleSystemId"],
+                              $_POST["startColor"],
+                              $_POST["endColor"]
+                            );
+    $submittedParticleSystem->saveToFile();
+    // redirect back to previous page
+    header('Location: ' . $_SERVER['HTTP_REFERER']);
+  }
 
   /**
    * Function to handle an error.

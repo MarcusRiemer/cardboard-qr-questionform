@@ -20,10 +20,6 @@
                             $_POST["positionId"],
                             $_POST["position"],
 							$array
-                            //array($_POST["destination1"],
-                              //    $_POST["destination2"],
-                                //  $_POST["destination3"],
-                                  //$_POST["destination4"])
                           );
   $submittedPosition->saveToFile(DataType::POSITION);
 

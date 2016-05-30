@@ -48,7 +48,10 @@
         <thead>
           <tr>
             <th data-field="id">ID</th>
-			<th data-field="location">Ort</th>
+			<th data-field="location">Ortsname</th>
+			<th data-field="describtion">Beschreibung</th>
+			<th data-field="bssids">BSSIDs</th>
+			<th data-field="navigate">Navigierbar</th>
           </tr>
         </thead>
       </table>
@@ -58,10 +61,6 @@
       <button onclick="overview4.clearModal()" class="btn btn-info" data-toggle="modal" href="#location-modal">Neuen Ort anlegen</button>
     </div>
 	
-
-	
-	
-
     <!-- modal definition -->
     <div class="modal fade" id="location-modal" tabindex="-1">
       <div class="modal-dialog" role="document">
@@ -81,16 +80,41 @@
 			  
 			  <div class="form-group">
                 <div class="page-header text-center">
-                  <h4>Ort</h4>
+                  <h4>Ortsname</h4>
                 </div>
                 <textarea class="form-control" rows="1" id="location-content" placeholder="Bitte Ort hier eingeben..." name="location"></textarea>
               </div>
 			  
+			  <div class="form-group">
+                <div class="page-header text-center">
+                  <h4>Beschreibung</h4>
+                </div>
+                <textarea class="form-control" rows="5" id="location-describtion" placeholder="Bitte Ortsbeschreibung hier eingeben..."  name="describtion"></textarea>
+              </div>
+			  
+			   <div class="form-group">
+                <div class="page-header text-center">
+                  <h4>BSSIDs</h4>
+                </div>
+                <textarea class="form-control" rows="5" id="location-bssids" placeholder="Bitte alle BSSIDs, die diesen Ort repräsentieren, leerzeichensepariert eingeben..." name="bssids"></textarea>
+              </div>
+			  
+			  <div class="page-header text-center">
+				<h4>Ist dieser Ort navigierbar?</h4>
+              </div>
+			  <div class="text-center">
+				<div class="btn-group" data-toggle="buttons">
+					<label class="btn btn-default">
+						<input type="radio" name="navigateChoice" value="0" /> Nein
+                    </label>
+                    <label class="btn btn-default">
+						<input type="radio" name="navigateChoice" value="1" /> Ja
+                    </label>
+                </div>
+              </div>
+			  
 			   <hr>
 			   
-			   
-			   
-
               <button type="submit" class="btn btn-info">Save Changes</button>
               <button type="button" id="delete4-button" onclick="overview4.sendDeleteRequest()" class="btn btn-danger">Delete</button>
             </form>

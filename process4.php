@@ -5,7 +5,10 @@
   // create location from POST data
   $submittedLocation = new Location(
                             $_POST["locationId"],
-							$_POST["location"]
+							$_POST["location"],
+							$_POST["describtion"],
+							$_POST["bssids"],
+							$_POST["navigateChoice"]
                           );
   $submittedLocation->saveToFile(DataType::LOCATION);
 

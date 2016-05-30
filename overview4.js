@@ -3,8 +3,13 @@
   overview4.clearModal = function() {
     $('input[name=locationId]').removeAttr('value');
     $('#location-content').val('');
+	$('#location-describtion').val('');
+	$('#location-bssids').val('');
+	
+	$('input[type=radio][value=nein]').parent().removeClass('active');
+    $('input[type=radio][value=ja]').parent().removeClass('active');
 
-    $('#delete3-button').addClass('hidden');
+    $('#delete4-button').addClass('hidden');
 
   };
 
@@ -32,6 +37,13 @@
 
       $('input[name=locationId]').attr('value', row.id);
       $('#location-content').val(row.location);
+	  $('#location-describtion').val(row.describtion);
+	  $('#location-bssids').val(row.bssids);
+	  
+	  var navigate = row.navigate;
+
+      $('input[type=radio][value=' + navigate +"]").parent().addClass('active');
+      $('input[type=radio][value=' + navigate +"]").attr('checked', '');
 	  
       $('#delete4-button').removeClass('hidden');
     });
