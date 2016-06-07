@@ -1,6 +1,6 @@
-(function( overview2, $, undefined ) {
+(function( overviewPosition, $, undefined ) {
 
-  overview2.clearModal = function() {
+  overviewPosition.clearModal = function() {
     $('input[name=positionId]').removeAttr('value');
     $('#position-content').val('');
 
@@ -15,12 +15,12 @@
 	    }	
 	);
 	
-	$('#qr-preview2').addClass('hidden');
+	$('#qr-preview-position').addClass('hidden');
     $('#delete2-button').addClass('hidden');
     $('#print2-button').addClass('hidden');
   };
 
-  overview2.print = function() {
+  overviewPosition.print = function() {
     var prtContent = document.getElementById("print-page2");
     var WinPrint = window.open('', '', 'left=0,top=0,toolbar=0,scrollbars=0,status=0');
     WinPrint.document.write(prtContent.innerHTML);
@@ -30,7 +30,7 @@
     WinPrint.close();
   };
 
-  overview2.sendDeleteRequest = function() {
+  overviewPosition.sendDeleteRequest = function() {
     var id = $('input[name=positionId]').val();
 
     $.ajax({
@@ -43,7 +43,7 @@
     });
   };
   
-  overview2.createHtml = function(jsonString) {
+  overviewPosition.createHtml = function(jsonString) {
 	var tableData = JSON.parse(jsonString);
     var container = document.getElementById("locontainer");
 	while (container.hasChildNodes()) {
@@ -73,15 +73,15 @@
     }
   }
 
-  overview2.updateTable = function(jsonString) {
+  overviewPosition.updateTable = function(jsonString) {
     var tableData = JSON.parse(jsonString);
 
     $('#position-table').bootstrapTable({
       data: tableData.positions
     }).on('click-row.bs.table', function (e, row, $element) {
-      overview2.clearModal();
+      overviewPosition.clearModal();
 
-      $('#qr-preview2').removeClass('hidden');
+      $('#qr-preview-position').removeClass('hidden');
 	  
       $('input[name=positionId]').attr('value', row.id);
       $('#position-content').val(row.position);
@@ -98,7 +98,7 @@
 	  );
 	  
       $.get(
-          "api.php/qrcodes2/" + row.id,
+          "api.php/qrcodesPosition/" + row.id,
           {},
           function(data) {
             var qrCodes = JSON.parse(data);
@@ -108,7 +108,7 @@
       );
 	  
 	  $.get(
-		"api.php/qrcodesprint2/" + row.id,
+		"api.php/qrcodesprintPosition/" + row.id,
         {},
 		function(data) {
 			var qrCodes = JSON.parse(data);
@@ -130,7 +130,7 @@
     // data-toggle="modal" href="#position-modal"
   };
 
-  overview2.showModal = function() {
+  overviewPosition.showModal = function() {
     $('#position-modal').modal('show');
   };
-}( window.overview2 = window.overview2 || {}, jQuery ));
+}( window.overviewPosition = window.overviewPosition || {}, jQuery ));

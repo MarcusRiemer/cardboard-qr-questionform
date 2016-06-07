@@ -15,7 +15,7 @@
     $array[] = $_POST["destination$i"];
   }
   
-  // create question from POST data
+  // create position from POST data
   $submittedPosition = new Position(
                             $_POST["positionId"],
                             $_POST["position"],

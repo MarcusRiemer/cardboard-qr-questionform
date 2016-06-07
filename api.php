@@ -125,13 +125,43 @@
 
     return '{"locations":' . "[" . implode(",", $locations) . "]" . "}";
   }
+  
+  /**
+   * Function to handle the "/particlesystems/" REST-GET call to get all
+   * particle systems.
+   *
+   * It looks for all existing particle systems on the file-system and
+   * returns them all in JSON-format.
+   * The JSON will be an JSON-object, containing an JSON-object "particleSystems",
+   * which contains an array of all particle systems in JSON.
+   *
+   * @return string - The JSON answer.
+   */
+  function get_particlesystems() {
+    if (!file_exists("particles/")) {
+      return '{"particles": []}';
+    }
+    $particles = array();
+	
+    $iterator = new FilesystemIterator("particles/", FilesystemIterator::SKIP_DOTS);
+    while($iterator->valid()) {
+		
+      $file = fopen($iterator->getPathname(), "r");
+      $content = fread($file, filesize($iterator->getPathname()));
+      fclose($file);
+      array_push($particles, $content);
+	  
+      $iterator->next();
+    }
+    return '{"particles":' . "[" . implode(",", $particles) . "]" . "}";
+  }
 
   /**
    * Class to hold google-api qr-code urls for a pair (question, coin).
    *
    * It implements the JsonSerializable-interface.
    */
-  class QRCodeUrls implements JsonSerializable {
+  class QuestionQRCodeUrls implements JsonSerializable {
     private $question;
     private $coin;
 
@@ -141,7 +171,7 @@
      * @param string      $questionUrl       The question qr-code url.
      * @param string      $coinUrl           The coin qr-code url.
      *
-     * @return QRCodeUrls
+     * @return QuestionQRCodeUrls
      */
     public function __construct($questionUrl, $coinUrl) {
       $this->question = $questionUrl;
@@ -184,9 +214,37 @@
       return json_encode($this);
     }
   }
+  
+      /**
+   * Class to hold google-api qr-code urls for a particles.
+   *
+   * It implements the JsonSerializable-interface.
+   */
+  class ParticleQRCodeUrl implements JsonSerializable {
+    private $particle;
+
+    /**
+     * Constructor.
+     *
+     * @param string      $particleUrl       The particle qr-code url.
+     *
+     * @return ParticleQRCodeUrl
+     */
+    public function __construct($particleUrl) {
+      $this->particle = $particleUrl;
+    }
+
+    public function jsonSerialize() {
+      return get_object_vars($this);
+    }
+
+    public function toJson() {
+      return json_encode($this);
+    }
+  }
 
   /**
-   * Function to handle the "/qrcodes/<id>" and "/qrcodesprint/<id>" REST-GET calls.
+   * Function to handle the "/qrCodesQuestion/<id>" and "/qrCodesprintQuestion/<id>" REST-GET calls.
    *
    * It returns a JSON-string in which the google-api qr-code urls for both
    *  - the question
@@ -198,7 +256,7 @@
    *
    * @return string - The answer JSON-string.
    */
-  function get_qrcodes_by_id($id, $dimension) {
+  function get_question_qrcodes_by_id($id, $dimension) {
     $questionFilename = "questions/".$id.".json";
 
     if (!file_exists($questionFilename)) {
@@ -227,12 +285,12 @@
           ."&chs=".$dimension."x".$dimension
           ."&chl=".urlencode($coinContent);
 
-    $qrCodes = new QRCodeUrls($questionUrl, $coinUrl);
-    return $qrCodes->toJson();
+    $qrCodesQuestion = new QuestionQRCodeUrls($questionUrl, $coinUrl);
+    return $qrCodesQuestion->toJson();
   }
   
     /**
-   * Function to handle the "/qrcodes2/<id>" and "/qrcodesprint2/<id>" REST-GET calls.
+   * Function to handle the "/qrcodesPosition/<id>" and "/qrcodesprintPosition/<id>" REST-GET calls.
    *
    * It returns a JSON-string in which the google-api qr-code urls for both
    *  - the position
@@ -257,8 +315,37 @@
           ."&chs=".$dimension."x".$dimension
           ."&chl=".urlencode(json_encode($positionShortObject));
 
-    $qrCodes2 = new PositionQRCodeUrl($positionUrl);
-    return $qrCodes2->toJson();
+    $qrCodesPosition = new PositionQRCodeUrl($positionUrl);
+    return $qrCodesPosition->toJson();
+  }
+  
+    /**
+   * Function to handle the "/particleqrcode/<id>" and "/particleqrcodeprint/<id>" REST-GET calls.
+   *
+   * It returns a JSON-string in which the google-api qr-code urls for the system.
+   * are contained in fields with respective names.
+   *
+   * @param int         $id             The particle system id.
+   * @param int         $dimension      The wanted qr-code dimension.
+   *
+   * @return string - The answer JSON-string.
+   */
+  function get_particle_qrcode_by_id($id, $dimension) {
+    $particleFilename = "particles/".$id.".json";
+	
+    if (!file_exists($particleFilename)) {
+      http_response_code(404);
+      return "";
+    }
+	
+	$particleShortObject = (object) ['id' => $id, 'type' => DataType::PARTICLESYSTEM];
+
+    $particleUrl = "https://chart.googleapis.com/chart?cht=qr&choe=UTF-8"
+          ."&chs=".$dimension."x".$dimension
+          ."&chl=".urlencode(json_encode($particleShortObject));
+		  
+    $qrCodesParticle = new ParticleQRCodeUrl($particleUrl);
+    return $qrCodesParticle->toJson();
   }
 
   /**
@@ -376,6 +463,24 @@
 
     return "";
   }
+  
+    /**
+   * Function to handle the "/particles/<id>" REST-DELETE call.
+   * It deletes the particle system with the given id, if existing.
+   * Otherwise nothing happens.
+   *
+   * @param int         $id             The particle system id.
+   *
+   * @return string - an empty string.
+   */
+  function delete_particlesystem($id) {
+    $particleFilename = "particles/".$id.".json";
+	
+    if (file_exists($particleFilename)) {
+      unlink($particleFilename);
+    }
+    return "";
+  }
 
   /**
    * Function to handle the "/questions/<id>" REST-GET call.
@@ -469,37 +574,7 @@
     return "";
   }
   
-  /***************************************************************************/
-  /* PARTICLE SYSTEMS */
-  /**
-   * Function to handle the "/particlesystems/" REST-GET call to get all
-   * particle systems.
-   *
-   * It looks for all existing particle systems on the file-system and
-   * returns them all in JSON-format.
-   * The JSON will be an JSON-object, containing an JSON-object "particleSystems",
-   * which contains an array of all particle systems in JSON.
-   *
-   * @return string - The JSON answer.
-   */
-  function get_particlesystems() {
-    if (!file_exists("particles/")) {
-      return '{"particles": []}';
-    }
-    $particleSystems = array();
-    $iterator = new FilesystemIterator("particles/", FilesystemIterator::SKIP_DOTS);
-    while($iterator->valid()) {
-      $file = fopen($iterator->getPathname(), "r");
-      $content = fread($file, filesize($iterator->getPathname()));
-      fclose($file);
-      array_push($particleSystems, $content);
-      $iterator->next();
-    }
-    return '{"particles":' . "[" . implode(",", $particleSystems) . "]" . "}";
-  }
-  
-  
-  /**
+    /**
    * Function to handle the "/particles/<id>" REST-GET call.
    * It returns the particle system json, if a system with the given id exists.
    * Otherwise it returns an empty 404 HttpMessage.
@@ -510,6 +585,7 @@
    */
   function get_particlesystem_by_id($id) {
     $filePath = "particles/".$id.".json";
+	
     if (file_exists($filePath)) {
       $file = fopen($filePath, "r");
       $content = fread($file, filesize($filePath));
@@ -520,48 +596,6 @@
     return "";
   }
   
-  /**
-   * Function to handle the "/particles/<id>" REST-DELETE call.
-   * It deletes the particle system with the given id, if existing.
-   * Otherwise nothing happens.
-   *
-   * @param int         $id             The particle system id.
-   *
-   * @return string - an empty string.
-   */
-  function delete_particlesystem($id) {
-    $particleFilename = "particles/".$id.".json";
-    if (file_exists($particleFilename)) {
-      unlink($particleFilename);
-    }
-    return "";
-  }
-  /**
-   * Function to handle the "/particleqrcode/<id>" and "/particleqrcodeprint/<id>" REST-GET calls.
-   *
-   * It returns a JSON-string in which the google-api qr-code urls for the system.
-   * are contained in fields with respective names.
-   *
-   * @param int         $id             The particle system id.
-   * @param int         $dimension      The wanted qr-code dimension.
-   *
-   * @return string - The answer JSON-string.
-   */
-  function get_particle_qrcode_by_id($id, $dimension) {
-    $filename = "particles/".$id.".json";
-    if (!file_exists($filename)) {
-      http_response_code(404);
-      return "";
-    }
-    $file = fopen($filename, "r");
-    $particleContent = fread($file, filesize($filename));
-    fclose($file);
-    $Url = "https://chart.googleapis.com/chart?cht=qr&choe=UTF-8"
-          ."&chs=".$dimension."x".$dimension
-          ."&chl=".urlencode($particleContent);
-    return '{"url":"'.$Url.'"}';
-  }
-
   /**
    * Function to handle an error.
    * It simply returns an empty 400 HttpMessage.
@@ -669,8 +703,11 @@
 		  if ($requestSize == 1) {
 			exit(get_particlesystems());
 		  }			
+		  
 		  if ($requestSize == 2) {
 			if ($request[1] == "") {
+			  // special case.
+              // http://localhost/cardboard-qr-marker-frontend/api.php/particles/
 -           	exit(get_particlesystems());
 			}
 			exit(get_particlesystem_by_id($request[1]));
@@ -683,19 +720,19 @@
 			}
 			handle_error();
   
-        case 'qrcodes':
-          exit(get_qrcodes_by_id($request[1], 200));
-        case 'qrcodesprint':
-          exit(get_qrcodes_by_id($request[1], 400));
+        case 'qrcodesQuestion':
+          exit(get_question_qrcodes_by_id($request[1], 200));
+        case 'qrcodesprintQuestion':
+          exit(get_question_qrcodes_by_id($request[1], 400));
         case 'questioncount':
           exit(get_question_count());
-		case 'qrcodes2':
+		case 'qrcodesPosition':
           exit(get_position_qrcode_by_id($request[1], 200));
-        case 'qrcodesprint2':
+        case 'qrcodesprintPosition':
           exit(get_position_qrcode_by_id($request[1], 400));
-		case 'qrcodes5':
+		case 'qrcodesParticle':
           exit(get_particle_qrcode_by_id($request[1], 200));
-        case 'qrcodesprint5':
+        case 'qrcodesprintParticle':
           exit(get_particle_qrcode_by_id($request[1], 400));
 		case 'locationcount':
           exit(get_location_count());	

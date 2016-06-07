@@ -1,6 +1,6 @@
-(function( overview, $, undefined ) {
+(function( overviewQuestion, $, undefined ) {
 
-  overview.clearModal = function() {
+  overviewQuestion.clearModal = function() {
     $('input[name=questionId]').removeAttr('value');
     $('#question-content').val('');
 
@@ -14,12 +14,12 @@
     $('input[type=radio][value=3]').parent().removeClass('active');
     $('input[type=radio][value=4]').parent().removeClass('active');
 
-    $('#qr-preview').addClass('hidden');
+    $('#qr-preview-question').addClass('hidden');
     $('#delete-button').addClass('hidden');
     $('#print-button').addClass('hidden');
   };
 
-  overview.print = function() {
+  overviewQuestion.print = function() {
     var prtContent = document.getElementById("print-page");
     var WinPrint = window.open('', '', 'left=0,top=0,toolbar=0,scrollbars=0,status=0');
     WinPrint.document.write(prtContent.innerHTML);
@@ -29,7 +29,7 @@
     WinPrint.close();
   };
 
-  overview.sendDeleteRequest = function() {
+  overviewQuestion.sendDeleteRequest = function() {
     var id = $('input[name=questionId]').val();
 
     $.ajax({
@@ -42,15 +42,15 @@
     });
   };
 
-  overview.updateTable = function(jsonString) {
+  overviewQuestion.updateTable = function(jsonString) {
     var tableData = JSON.parse(jsonString);
 
     $('#question-table').bootstrapTable({
       data: tableData.questions
     }).on('click-row.bs.table', function (e, row, $element) {
-      overview.clearModal();
+      overviewQuestion.clearModal();
 
-      $('#qr-preview').removeClass('hidden');
+      $('#qr-preview-question').removeClass('hidden');
 
       $('input[name=questionId]').attr('value', row.id);
       $('#question-content').val(row.question);
@@ -66,7 +66,7 @@
       $('input[type=radio][value=' + correctAnswer +"]").attr('checked', '');
 
       $.get(
-          "api.php/qrcodes/" + row.id,
+          "api.php/qrcodesQuestion/" + row.id,
           {},
           function(data) {
               var qrCodes = JSON.parse(data);
@@ -77,7 +77,7 @@
       );
 
       $.get(
-          "api.php/qrcodesprint/" + row.id,
+          "api.php/qrcodesprintQuestion/" + row.id,
           {},
           function(data) {
               var qrCodes = JSON.parse(data);
@@ -100,7 +100,7 @@
     // data-toggle="modal" href="#question-modal"
   };
 
-  overview.showModal = function() {
+  overviewQuestion.showModal = function() {
     $('#question-modal').modal('show');
   };
-}( window.overview = window.overview || {}, jQuery ));
+}( window.overviewQuestion = window.overviewQuestion || {}, jQuery ));

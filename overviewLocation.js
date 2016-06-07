@@ -1,6 +1,6 @@
-(function( overview4, $, undefined ) {
+(function( overviewLocation, $, undefined ) {
 
-  overview4.clearModal = function() {
+  overviewLocation.clearModal = function() {
     $('input[name=locationId]').removeAttr('value');
     $('#location-content').val('');
 	$('#location-describtion').val('');
@@ -13,7 +13,7 @@
 
   };
 
-  overview4.sendDeleteRequest = function() {
+  overviewLocation.sendDeleteRequest = function() {
     var id = $('input[name=locationId]').val();
 
     $.ajax({
@@ -26,13 +26,13 @@
     });
   };
 
-  overview4.updateTable = function(jsonString) {
+  overviewLocation.updateTable = function(jsonString) {
     var tableData = JSON.parse(jsonString);
 
     $('#location-table').bootstrapTable({
       data: tableData.locations
     }).on('click-row.bs.table', function (e, row, $element) {
-      overview4.clearModal();
+      overviewLocation.clearModal();
 
 
       $('input[name=locationId]').attr('value', row.id);
@@ -54,7 +54,7 @@
     // data-toggle="modal" href="#location-modal"
   };
 
-  overview4.showModal = function() {
+  overviewLocation.showModal = function() {
     $('#location-modal').modal('show');
   };
-}( window.overview4 = window.overview4 || {}, jQuery ));
+}( window.overviewLocation = window.overviewLocation || {}, jQuery ));
