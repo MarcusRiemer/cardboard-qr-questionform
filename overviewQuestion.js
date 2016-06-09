@@ -15,12 +15,12 @@
     $('input[type=radio][value=4]').parent().removeClass('active');
 
     $('#qr-preview-question').addClass('hidden');
-    $('#delete-button').addClass('hidden');
-    $('#print-button').addClass('hidden');
+    $('#deleteQuestion-button').addClass('hidden');
+    $('#printQuestion-button').addClass('hidden');
   };
 
   overviewQuestion.print = function() {
-    var prtContent = document.getElementById("print-page");
+    var prtContent = document.getElementById("printQuestion-page");
     var WinPrint = window.open('', '', 'left=0,top=0,toolbar=0,scrollbars=0,status=0');
     WinPrint.document.write(prtContent.innerHTML);
     WinPrint.document.close();
@@ -87,10 +87,10 @@
           }
       );
 
-      $('#print-title').html("Frage: " + row.question);
+      $('#printQuestion-title').html("Frage: " + row.question);
 
-      $('#delete-button').removeClass('hidden');
-      $('#print-button').removeClass('hidden');
+      $('#deleteQuestion-button').removeClass('hidden');
+      $('#printQuestion-button').removeClass('hidden');
 
     });
 

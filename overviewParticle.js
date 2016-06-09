@@ -4,15 +4,15 @@
     $('input[name=particleId]').removeAttr('value');
 
     $('#qr-preview-particle').addClass('hidden');
-    $('#delete5-button').addClass('hidden');
-    $('#print5-button').addClass('hidden');
+    $('#deleteParticle-button').addClass('hidden');
+    $('#printParticle-button').addClass('hidden');
 	
 	$('#start-color-picker').colorpicker('setValue', '#000000');
     $('#end-color-picker').colorpicker('setValue', '#000000');
   };
 
   overviewParticle.print = function() {
-    var prtContent = document.getElementById("print-page5");
+    var prtContent = document.getElementById("printParticle-page");
     var WinPrint = window.open('', '', 'left=0,top=0,toolbar=0,scrollbars=0,status=0');
     WinPrint.document.write(prtContent.innerHTML);
     WinPrint.document.close();
@@ -71,10 +71,10 @@
           }
       );
 
-      $('#print-title5').html("Partikelsystem: " + row.startColor + " - " + row.endColor);
+      $('#printParticle-title').html("Partikelsystem: " + row.startColor + " - " + row.endColor);
 
-      $('#delete5-button').removeClass('hidden');
-      $('#print5-button').removeClass('hidden');
+      $('#deleteParticle-button').removeClass('hidden');
+      $('#printParticle-button').removeClass('hidden');
 
     });
 

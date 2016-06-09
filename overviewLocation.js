@@ -9,7 +9,7 @@
 	$('input[type=radio][value=nein]').parent().removeClass('active');
     $('input[type=radio][value=ja]').parent().removeClass('active');
 
-    $('#delete4-button').addClass('hidden');
+    $('#deleteLocation-button').addClass('hidden');
 
   };
 
@@ -45,7 +45,7 @@
       $('input[type=radio][value=' + navigate +"]").parent().addClass('active');
       $('input[type=radio][value=' + navigate +"]").attr('checked', '');
 	  
-      $('#delete4-button').removeClass('hidden');
+      $('#deleteLocation-button').removeClass('hidden');
     });
 
     $('#location-table > tbody > tr').attr('data-toggle', 'modal');

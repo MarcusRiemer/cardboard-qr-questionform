@@ -6,7 +6,7 @@
 	$('#thing-start').val('');
 	$('#thing-location').val('');
 
-    $('#delete3-button').addClass('hidden');
+    $('#deleteThing-button').addClass('hidden');
 
   };
 
@@ -65,7 +65,7 @@
 	  $('#thing-start').val(row.start);
 	  $('#thing-location').val(row.location);
 
-      $('#delete3-button').removeClass('hidden');
+      $('#deleteThing-button').removeClass('hidden');
 
     });
 

@@ -16,12 +16,12 @@
 	);
 	
 	$('#qr-preview-position').addClass('hidden');
-    $('#delete2-button').addClass('hidden');
-    $('#print2-button').addClass('hidden');
+    $('#deletePosition-button').addClass('hidden');
+    $('#printPosition-button').addClass('hidden');
   };
 
   overviewPosition.print = function() {
-    var prtContent = document.getElementById("print-page2");
+    var prtContent = document.getElementById("printPosition-page");
     var WinPrint = window.open('', '', 'left=0,top=0,toolbar=0,scrollbars=0,status=0');
     WinPrint.document.write(prtContent.innerHTML);
     WinPrint.document.close();
@@ -117,10 +117,10 @@
         }
       );
 	  
-	  $('#print-title2').html("Position: " + row.position);
+	  $('#printPosition-title').html("Position: " + row.position);
 	  
-      $('#delete2-button').removeClass('hidden');
-      $('#print2-button').removeClass('hidden');
+      $('#deletePosition-button').removeClass('hidden');
+      $('#printPosition-button').removeClass('hidden');
 	  
      });
 
